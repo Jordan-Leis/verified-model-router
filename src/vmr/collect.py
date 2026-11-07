@@ -18,7 +18,7 @@ from vmr.llm import MockClient, OpenRouterClient
 from vmr.problems import load
 from vmr.prompts import build_prompt
 
-WORKERS = 4
+WORKERS = 8  # Calls are network-bound; interleaving models keeps one slow model from blocking the rest.
 
 
 def slug_file(slug: str) -> str:
@@ -47,7 +47,8 @@ def collect(problems: list[dict], models: list[dict], out: Path, client, budget:
     for model in models:
         path = out / slug_file(model["slug"])
         done = {r["problem_id"] for r in read_records(path) if r["error"] is None}
-        tasks += [(model, p, path) for p in problems if p["id"] not in done]
+        tasks += [(index, model, p, path) for index, p in enumerate(problems) if p["id"] not in done]
+    tasks = [task[1:] for task in sorted(tasks, key=lambda t: t[0])]
     print(f"{len(tasks)} calls to make; ${spent:.4f} already spent; budget ${budget:.2f}", flush=True)
 
     def run(task):
