@@ -16,3 +16,17 @@ solved by nearly every model. The tiers were rebuilt, and then calibrated on sep
   result. The main set is generated and run once, after calibration ends.
 
 Pilot responses stay in `data/pilot*/` so this can be audited. The outcome of each pilot is below.
+
+## Outcome
+
+- **Smoke test** (`data/smoke_v1`, `data/smoke`): `reasoning: disabled` was rejected by most frontier
+  endpoints, so the shared setting became `reasoning.effort=low`. At that setting, the original tier 3
+  was solved by nearly every model.
+- **Pilot 1** (`data/pilot1`, seed 7, with the tiers at the time): every family was above or near the
+  ceiling of the target range. Integrals missed it.
+- **Pilot 2** (`data/pilot2`, seed 8, with the final tiers): every family was within 40-85%, and tier 3
+  was below tier 1 in every family. Calibration stopped here, and the main set (seed 20261107) was run
+  once.
+
+`make reproduce` rescores both pilots into `results/pilots.json`, so the exact figures can be checked.
+The models, prompt and verifier were the same in both pilots and the main run.
