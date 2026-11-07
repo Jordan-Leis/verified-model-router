@@ -102,11 +102,13 @@ def dimension_vector(quantity) -> tuple:
     return tuple(by_name.get(name, sp.Integer(0)) for name in BASE_NAMES)
 
 
-def monomial_dimension(powers: dict[str, sp.Rational]) -> tuple:
-    table = {**SI_UNITS, **PHYSICAL_CONSTANTS}
+def monomial_dimension(powers: dict[str, sp.Rational], table: dict | None = None) -> tuple:
+    """Total dimension of a monomial. `table` gives per-problem names as stored exponent vectors."""
+    units = {**SI_UNITS, **PHYSICAL_CONSTANTS}
     total = [sp.Integer(0)] * len(BASE_NAMES)
     for name, power in powers.items():
-        for i, exponent in enumerate(dimension_vector(table[name])):
+        vector = [sp.Rational(v) for v in table[name]] if table else dimension_vector(units[name])
+        for i, exponent in enumerate(vector):
             total[i] += power * exponent
     return tuple(total)
 
@@ -195,7 +197,7 @@ def _verify_dimension(answer: str, problem: dict) -> Verdict:
     except ParseFailure as failure:
         return Verdict(UNPARSEABLE, failure.reason)
     target = tuple(sp.Rational(value) for value in problem["truth_dimension"])
-    if monomial_dimension(powers) == target:
+    if monomial_dimension(powers, problem.get("name_dimensions")) == target:
         return Verdict(CORRECT, "", "dimensional")
     return Verdict(WRONG, "dimension_mismatch", "dimensional")
 

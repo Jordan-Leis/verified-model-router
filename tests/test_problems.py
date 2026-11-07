@@ -4,7 +4,7 @@ from vmr.problems import MAIN_SEED, derivative_at_zero, generate, self_check, x
 from vmr.prompts import build_prompt
 from vmr.verifier import CORRECT, verify_answer
 
-SMALL = {"derivative": (2, 2, 4), "integral": (2, 3, 5), "dimension": (2, 2, 2)}
+SMALL = {"derivative": (3, 4, 2), "integral": (3, 3, 4), "dimension": (2, 2, 2)}
 
 
 def test_taylor_shortcut_matches_direct_differentiation():

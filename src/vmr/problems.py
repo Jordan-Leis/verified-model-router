@@ -1,7 +1,7 @@
 """Seeded problem generator. Run `python -m vmr.problems` to write data/problems.jsonl.
 
 Each family has three tiers. Templates are used round-robin inside a tier, with seeded random
-parameters, so one family's tiers stay comparable when counts change.
+parameters. docs/calibration.md records how the tiers were set and what was held fixed.
 """
 
 from __future__ import annotations
@@ -101,22 +101,41 @@ def derivative_at_zero(factors: list[sp.Expr], order: int) -> sp.Rational:
     return product[order] * sp.factorial(order)
 
 
+SIMPLE_FACTORS = [
+    lambda r: sp.exp(_nonzero(r, -3, 3) * x), lambda r: sp.cos(r.randint(1, 3) * x),
+    lambda r: sp.log(1 + r.randint(1, 3) * x), lambda r: 1 / (1 + r.randint(1, 3) * x ** 2),
+    lambda r: 1 / (1 - r.randint(1, 3) * x), lambda r: sp.sqrt(1 + 4 * r.randint(1, 3) * x),
+    lambda r: sp.atan(r.randint(1, 3) * x),
+]
+COMPOSITE_FACTORS = [
+    lambda r: sp.exp(sp.sin(r.randint(1, 3) * x)), lambda r: sp.log(1 + sp.sin(r.randint(1, 2) * x)),
+    lambda r: sp.atan(sp.exp(r.randint(1, 2) * x) - 1), lambda r: sp.tan(r.randint(1, 3) * x),
+    lambda r: sp.exp(sp.atan(r.randint(1, 2) * x)), lambda r: sp.cos(sp.sin(r.randint(1, 2) * x)),
+]
+
+
+def _series_hard(r):
+    return [r.choice(COMPOSITE_FACTORS)(r)] + [make(r) for make in r.sample(SIMPLE_FACTORS, 2)]
+
+
+def _value_problem(factors, order):
+    f = sp.Mul(*factors)
+    value = derivative_at_zero(factors, order)
+    statement = f"Let f(x) = {f}. Compute the exact value of the derivative of order {order} of f at x = 0."
+    return statement, "value", str(value), {"domain": ["1", "2"]}
+
+
 def _derivative_problem(rng, tier, slot):
-    if tier == 3 and slot % 2 == 0:
-        make = [_series_a, _series_b, _series_c][(slot // 2) % 3]
-        order = rng.randint(6, 8)
-        factors = make(rng)
-        f = sp.Mul(*factors)
-        value = derivative_at_zero(factors, order)
-        statement = f"Let f(x) = {f}. Compute the exact value of the derivative of order {order} of f at x = 0."
-        return statement, "value", str(value), {"domain": ["1", "2"]}
+    if tier == 3:
+        return _value_problem(_series_hard(rng), rng.randint(9, 11))
+    if tier == 2 and slot % 2 == 0:
+        return _value_problem([_series_a, _series_b, _series_c][(slot // 2) % 3](rng), rng.randint(6, 8))
     templates = {
-        1: [_d1_power_trig, _d1_chain_power, _d1_exp_log],
-        2: [_d2_quotient, _d2_nested, _d2_root_product],
-        3: [_d3_nested_third, _d3_tower_third],
+        1: [_d1_power_trig, _d1_chain_power, _d1_exp_log, _d2_quotient, _d2_nested, _d2_root_product],
+        2: [_d3_nested_third, _d3_tower_third],
     }[tier]
-    # Tier 3 gives its even slots to the series problems, so only every second slot reaches this list.
-    index = slot // 2 if tier == 3 else slot
+    # Tier 2 gives its even slots to the series problems, so only every second slot reaches this list.
+    index = slot // 2 if tier == 2 else slot
     f, order = templates[index % len(templates)](rng)
     truth = sp.diff(f, x, order)
     name = {1: "first", 2: "second", 3: "third"}[order]
@@ -148,7 +167,7 @@ def _i2_partial_fractions(r):
 
 
 def _i2_poly_log(r):
-    return x ** r.randint(2, 4) * sp.log(x) ** 2
+    return x ** r.randint(2, 4) * sp.log(r.randint(1, 4) * x) ** 2
 
 
 def _i2_complete_square(r):
@@ -176,18 +195,59 @@ def _i3_root_quadratic(r):
     return x ** 2 * sp.sqrt(x ** 2 + r.randint(1, 6))
 
 
+def _h_poly_exp_trig(r):
+    return x ** 4 * sp.exp(r.randint(1, 3) * x) * r.choice([sp.sin, sp.cos])(r.randint(2, 3) * x)
+
+
+def _h_quartic(r):
+    return r.randint(1, 3) / (x ** 4 + r.choice([1, 2, 3, 4, 5, 9, 16]))
+
+
+def _h_cubic(r):
+    return (x + r.randint(1, 3)) / (x ** 3 + r.randint(1, 5) ** 3)
+
+
+def _h_repeated_mixed(r):
+    return (x ** 3 + r.randint(1, 3) * x + r.randint(1, 3)) / ((x + r.randint(1, 3)) ** 2 * (x ** 2 + r.randint(1, 3)) ** 2)
+
+
+def _h_log_cubed(r):
+    return x ** r.randint(2, 4) * sp.log(r.randint(2, 3) * x) ** 3
+
+
+def _h_trig_product(r):
+    return sp.sin(r.randint(2, 3) * x) ** 3 * sp.cos(r.randint(1, 4) * x) ** 2
+
+
+def _h_exp_two_trig(r):
+    return x * sp.exp(r.randint(1, 2) * x) * sp.sin(r.randint(2, 3) * x) * sp.cos(r.randint(1, 4) * x)
+
+
+def _h_root_poly(r):
+    a = r.randint(1, 3)
+    return x ** 3 * sp.sqrt(x ** 2 + 2 * a * x + a ** 2 + r.randint(1, 4))
+
+
+def _h_cubed_quadratic(r):
+    return x ** r.choice([0, 2, 5]) / (x ** 2 + r.randint(1, 6)) ** 3
+
+
 def _integral_problem(rng, tier, slot):
     templates = {
-        1: [_i1_poly_exp, _i1_x_trig, _i1_log_substitution],
-        2: [_i2_exp_trig, _i2_partial_fractions, _i2_poly_log, _i2_complete_square],
-        3: [_i3_poly_exp_trig, _i3_mixed_fractions, _i3_repeated_quadratic, _i3_x_atan, _i3_root_quadratic],
+        1: [_i1_poly_exp, _i1_x_trig, _i1_log_substitution, _i2_exp_trig, _i2_partial_fractions, _i2_poly_log,
+            _i2_complete_square],
+        2: [_i3_poly_exp_trig, _i3_mixed_fractions, _i3_repeated_quadratic, _i3_x_atan, _i3_root_quadratic],
+        3: [_h_poly_exp_trig, _h_quartic, _h_cubic, _h_repeated_mixed, _h_log_cubed, _h_trig_product,
+            _h_exp_two_trig, _h_root_poly, _h_cubed_quadratic],
     }[tier]
     make = templates[slot % len(templates)]
-    while True:
+    for _ in range(40):
         f = make(rng)
         reference = _antiderivative(f)
         if reference is not None:
             break
+    else:
+        raise RuntimeError(f"{make.__name__}: SymPy found no usable antiderivative")
     statement = (
         f"Find an antiderivative with respect to x of f(x) = {f} for x in (1/2, 3). "
         "Give any one antiderivative, in closed form, and leave out the constant of integration."
@@ -198,7 +258,7 @@ def _integral_problem(rng, tier, slot):
 def _antiderivative(f):
     """Return a closed form whose derivative matches f at high precision, or None."""
     try:
-        with time_limit(60):
+        with time_limit(20):
             result = sp.integrate(f, x)
     except _Timeout:
         return None
@@ -255,11 +315,10 @@ CONSTANT_LABELS = {
     "k_B": "the Boltzmann constant", "e_charge": "the elementary charge",
     "eps0": "the vacuum permittivity", "mu0": "the vacuum permeability",
 }
-CONSTANT_SETS = {
-    2: [("hbar", "c", "G"), ("hbar", "c", "k_B", "G")],
-    3: [("hbar", "c", "G", "eps0"), ("hbar", "c", "G", "k_B", "eps0"), ("hbar", "c", "G", "k_B", "mu0"),
-        ("hbar", "G", "e_charge", "k_B", "eps0")],
-}
+CONSTANT_SETS = [
+    ("hbar", "c", "G"), ("hbar", "c", "k_B", "G"), ("hbar", "c", "G", "eps0"), ("hbar", "c", "G", "k_B", "eps0"),
+    ("hbar", "c", "G", "k_B", "mu0"), ("hbar", "G", "e_charge", "k_B", "eps0"),
+]
 
 
 def _format_power(power: int) -> str:
@@ -281,37 +340,65 @@ def _compound_problem(rng):
     return statement, "dimension", [str(v) for v in total], {"allowed_names": sorted(SI_UNITS)}
 
 
-def _solve_exponents(constants, target):
-    matrix = sp.Matrix([[dimension_vector(PHYSICAL_CONSTANTS[c])[i] for c in constants] for i in range(5)])
-    if matrix.rank() != len(constants):
+def _solve_exponents(vectors: list[tuple], target: tuple) -> list | None:
+    """Solve for the exponents that give `target`. None means no unique rational solution exists."""
+    matrix = sp.Matrix([[v[i] for v in vectors] for i in range(5)])
+    if matrix.rank() != len(vectors):
         return None
-    symbols = sp.symbols(f"a0:{len(constants)}")
+    symbols = sp.symbols(f"a0:{len(vectors)}")
     solution = sp.linsolve((matrix, sp.Matrix(target)), *symbols)
     if not solution:
         return None
-    return dict(zip(constants, next(iter(solution))))
+    values = list(next(iter(solution)))
+    return values if all(v.is_Rational for v in values) else None
 
 
-def _monomial_problem(rng, tier):
+def _monomial_problem(rng):
     while True:
-        constants = rng.choice(CONSTANT_SETS[tier])
+        constants = rng.choice(CONSTANT_SETS)
         target_name = rng.choice(sorted(QUANTITIES) + sorted(DERIVED) + sorted(BASE))
         target = quantity_dimension(target_name)
-        solution = _solve_exponents(constants, target)
-        if solution is not None and all(v.is_Rational for v in solution.values()):
+        solution = _solve_exponents([dimension_vector(PHYSICAL_CONSTANTS[c]) for c in constants], target)
+        if solution is not None:
             break
-    assert monomial_dimension(solution) == target
+    exponents = dict(zip(constants, solution))
+    assert monomial_dimension(exponents) == target
     listed = ", ".join(f"{CONSTANT_LABELS[c]} ({c})" for c in constants)
     statement = (
         f"Find the unique product of powers of {listed} that has the dimensions of {target_name}. "
         "Numerical prefactors are ignored, so give the monomial with coefficient 1."
     )
-    extras = {"allowed_names": sorted(constants), "reference_exponents": {k: str(v) for k, v in solution.items()}}
+    extras = {"allowed_names": sorted(constants), "reference_exponents": {k: str(v) for k, v in exponents.items()}}
+    return statement, "monomial", [str(v) for v in target], extras
+
+
+def _basis_problem(rng):
+    """Express one named quantity in an arbitrary basis of five others: a 5x5 exact linear solve."""
+    pool = sorted(QUANTITIES) + sorted(DERIVED)
+    while True:
+        chosen = rng.sample(pool, 6)
+        basis, target_name = chosen[:5], chosen[5]
+        target = quantity_dimension(target_name)
+        solution = _solve_exponents([quantity_dimension(n) for n in basis], target)
+        if solution is None:
+            continue
+        if sum(1 for v in solution if v != 0) >= 4 and any(not v.is_Integer for v in solution):
+            break
+    names = [f"Q{i}" for i in range(1, 6)]
+    table = {name: [str(v) for v in quantity_dimension(q)] for name, q in zip(names, basis)}
+    exponents = dict(zip(names, solution))
+    assert monomial_dimension(exponents, table) == target
+    listed = ", ".join(f"{name} = {q}" for name, q in zip(names, basis))
+    statement = (
+        f"Let {listed}. Find the unique product of powers of Q1, Q2, Q3, Q4 and Q5 that has the dimensions of "
+        f"{target_name}. Numerical prefactors are ignored, so give the monomial with coefficient 1."
+    )
+    extras = {"allowed_names": names, "name_dimensions": table, "reference_exponents": {k: str(v) for k, v in exponents.items()}}
     return statement, "monomial", [str(v) for v in target], extras
 
 
 def _dimension_problem(rng, tier, slot):
-    return _compound_problem(rng) if tier == 1 else _monomial_problem(rng, tier)
+    return {1: _compound_problem, 2: _monomial_problem, 3: _basis_problem}[tier](rng)
 
 
 GENERATORS = {"derivative": _derivative_problem, "integral": _integral_problem, "dimension": _dimension_problem}

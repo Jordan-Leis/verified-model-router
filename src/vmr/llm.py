@@ -52,8 +52,11 @@ class OpenRouterClient:
                 if data.get("choices"):
                     return {"response": data, "attempts": attempt + 1, "error": None}
                 last_error = f"empty choices: {str(data.get('error'))[:300]}"
-            except Exception as error:  # noqa: BLE001 - every API failure is retried, then recorded.
+            except Exception as error:  # noqa: BLE001 - a failed call is recorded, never raised.
                 last_error = f"{type(error).__name__}: {str(error)[:300]}"
+                status = getattr(error, "status_code", None)
+                if status is not None and 400 <= status < 500 and status not in (408, 429):
+                    return {"response": None, "attempts": attempt + 1, "error": last_error}
             time.sleep(2**attempt)
         return {"response": None, "attempts": RETRIES, "error": last_error}
 
