@@ -1,0 +1,51 @@
+{
+ "snapshot_date": "2026-11-07",
+ "selection_rule": "Three different vendors at three output-price tiers (<$0.50, $0.50-$3, >=$5 per million tokens), general-purpose chat models (no code, vision or audio variants) that accept reasoning.effort=low. Anthropic models were excluded because Claude wrote this harness. Chosen before any accuracy was measured, except a 3-problem smoke test of availability and settings (data/smoke*).",
+ "models": [
+  {
+   "slug": "deepseek/deepseek-v4-flash",
+   "tier": "cheap",
+   "max_tokens": 16000,
+   "temperature": 0,
+   "extra_body": {
+    "reasoning": {
+     "effort": "low"
+    }
+   },
+   "list_price_per_million": {
+    "prompt": 0.091,
+    "completion": 0.182
+   }
+  },
+  {
+   "slug": "google/gemini-3.5-flash-lite",
+   "tier": "mid",
+   "max_tokens": 16000,
+   "temperature": 0,
+   "extra_body": {
+    "reasoning": {
+     "effort": "low"
+    }
+   },
+   "list_price_per_million": {
+    "prompt": 0.3,
+    "completion": 2.5
+   }
+  },
+  {
+   "slug": "openai/gpt-6.1-sol",
+   "tier": "premium",
+   "max_tokens": 16000,
+   "temperature": 0,
+   "extra_body": {
+    "reasoning": {
+     "effort": "low"
+    }
+   },
+   "list_price_per_million": {
+    "prompt": 2.0,
+    "completion": 10.0
+   }
+  }
+ ]
+}

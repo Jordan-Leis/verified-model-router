@@ -21,7 +21,7 @@ from vmr.verifier import (
 )
 
 MAIN_SEED = 20261107
-PILOT_SEED = 7
+PILOT_SEED = 8  # Pilot 1 used seed 7 with the earlier tiers; its problems are kept in data/pilot1/.
 TIER_COUNTS = {"derivative": (10, 15, 15), "integral": (10, 15, 15), "dimension": (10, 15, 15)}
 PILOT_COUNTS = {"derivative": (3, 3, 4), "integral": (3, 3, 4), "dimension": (3, 3, 4)}
 DEFAULT_DOMAIN = ("1/2", "3")
@@ -125,21 +125,22 @@ def _value_problem(factors, order):
     return statement, "value", str(value), {"domain": ["1", "2"]}
 
 
+def _series_hardest(r):
+    return [r.choice(COMPOSITE_FACTORS)(r)] + [make(r) for make in r.sample(SIMPLE_FACTORS, 3)]
+
+
 def _derivative_problem(rng, tier, slot):
+    """Pilot 2 tiers: T1 = third derivatives and order 6-8 series, T2 = order 9-11, T3 = order 12-13."""
     if tier == 3:
+        return _value_problem(_series_hardest(rng), rng.randint(12, 13))
+    if tier == 2:
         return _value_problem(_series_hard(rng), rng.randint(9, 11))
-    if tier == 2 and slot % 2 == 0:
+    if slot % 2 == 0:
         return _value_problem([_series_a, _series_b, _series_c][(slot // 2) % 3](rng), rng.randint(6, 8))
-    templates = {
-        1: [_d1_power_trig, _d1_chain_power, _d1_exp_log, _d2_quotient, _d2_nested, _d2_root_product],
-        2: [_d3_nested_third, _d3_tower_third],
-    }[tier]
-    # Tier 2 gives its even slots to the series problems, so only every second slot reaches this list.
-    index = slot // 2 if tier == 2 else slot
-    f, order = templates[index % len(templates)](rng)
+    templates = [_d3_nested_third, _d3_tower_third]
+    f, order = templates[(slot // 2) % len(templates)](rng)
     truth = sp.diff(f, x, order)
-    name = {1: "first", 2: "second", 3: "third"}[order]
-    statement = f"Let f(x) = {f} for x in (1/2, 3). Compute the {name} derivative of f with respect to x, as a function of x."
+    statement = f"Let f(x) = {f} for x in (1/2, 3). Compute the third derivative of f with respect to x, as a function of x."
     return statement, "expr", str(truth), {"domain": list(DEFAULT_DOMAIN)}
 
 
@@ -232,16 +233,42 @@ def _h_cubed_quadratic(r):
     return x ** r.choice([0, 2, 5]) / (x ** 2 + r.randint(1, 6)) ** 3
 
 
+def _x_poly5_exp_trig(r):
+    return x ** 5 * sp.exp(r.randint(1, 2) * x) * r.choice([sp.sin, sp.cos])(r.randint(2, 3) * x)
+
+
+def _x_quartic_ratio(r):
+    return (x ** 2 + r.randint(1, 4)) / (x ** 4 + r.choice([2, 3, 5, 6, 7]))
+
+
+def _x_trig_powers(r):
+    a = r.randint(1, 3)
+    return sp.sin(a * x) ** 5 * sp.cos(a * x) ** 4 + sp.cos(r.randint(2, 4) * x) ** 3 * sp.sin(a * x)
+
+
+def _x_cubed_repeated(r):
+    return (x ** 3 + r.randint(1, 3) * x ** 2 + r.randint(1, 3)) / ((x + r.randint(1, 3)) ** 3 * (x ** 2 + r.randint(1, 3)) ** 2)
+
+
+def _x_log_quartic(r):
+    return x ** r.randint(3, 5) * sp.log(r.randint(2, 3) * x) ** 4
+
+
+def _x_exp_three_trig(r):
+    return x ** 2 * sp.exp(r.randint(1, 2) * x) * sp.sin(r.randint(2, 3) * x) * sp.cos(r.randint(1, 4) * x)
+
+
 def _integral_problem(rng, tier, slot):
+    """Pilot 2 tiers: each earlier tier moved down one level, with a new, harder tier 3."""
     templates = {
-        1: [_i1_poly_exp, _i1_x_trig, _i1_log_substitution, _i2_exp_trig, _i2_partial_fractions, _i2_poly_log,
-            _i2_complete_square],
-        2: [_i3_poly_exp_trig, _i3_mixed_fractions, _i3_repeated_quadratic, _i3_x_atan, _i3_root_quadratic],
-        3: [_h_poly_exp_trig, _h_quartic, _h_cubic, _h_repeated_mixed, _h_log_cubed, _h_trig_product,
+        1: [_i3_poly_exp_trig, _i3_mixed_fractions, _i3_repeated_quadratic, _i3_x_atan, _i3_root_quadratic],
+        2: [_h_poly_exp_trig, _h_quartic, _h_cubic, _h_repeated_mixed, _h_log_cubed, _h_trig_product,
             _h_exp_two_trig, _h_root_poly, _h_cubed_quadratic],
+        3: [_x_poly5_exp_trig, _x_quartic_ratio, _x_trig_powers, _x_cubed_repeated, _x_log_quartic,
+            _x_exp_three_trig],
     }[tier]
     make = templates[slot % len(templates)]
-    for _ in range(40):
+    for _ in range(5):
         f = make(rng)
         reference = _antiderivative(f)
         if reference is not None:
@@ -372,17 +399,30 @@ def _monomial_problem(rng):
     return statement, "monomial", [str(v) for v in target], extras
 
 
-def _basis_problem(rng):
-    """Express one named quantity in an arbitrary basis of five others: a 5x5 exact linear solve."""
+def _basis_problem(rng, compound_target: bool = False):
+    """Express a target in an arbitrary basis of five named quantities: a 5x5 exact linear solve.
+
+    With `compound_target`, the target is itself a product of powers of two named quantities, and the
+    solution must have five nonzero exponents and a denominator of at least 3.
+    """
     pool = sorted(QUANTITIES) + sorted(DERIVED)
     while True:
-        chosen = rng.sample(pool, 6)
-        basis, target_name = chosen[:5], chosen[5]
-        target = quantity_dimension(target_name)
+        chosen = rng.sample(pool, 7)
+        basis = chosen[:5]
+        if compound_target:
+            p, q = _nonzero(rng, -2, 2), _nonzero(rng, -2, 2)
+            target = tuple(p * a + q * b for a, b in zip(quantity_dimension(chosen[5]), quantity_dimension(chosen[6])))
+            target_name = f"({chosen[5]}){_format_power(p)} * ({chosen[6]}){_format_power(q)}"
+        else:
+            target_name = chosen[5]
+            target = quantity_dimension(target_name)
         solution = _solve_exponents([quantity_dimension(n) for n in basis], target)
         if solution is None:
             continue
-        if sum(1 for v in solution if v != 0) >= 4 and any(not v.is_Integer for v in solution):
+        if compound_target:
+            if all(v != 0 for v in solution) and any(sp.Rational(v).q >= 3 for v in solution):
+                break
+        elif sum(1 for v in solution if v != 0) >= 4 and any(not v.is_Integer for v in solution):
             break
     names = [f"Q{i}" for i in range(1, 6)]
     table = {name: [str(v) for v in quantity_dimension(q)] for name, q in zip(names, basis)}
@@ -398,7 +438,10 @@ def _basis_problem(rng):
 
 
 def _dimension_problem(rng, tier, slot):
-    return {1: _compound_problem, 2: _monomial_problem, 3: _basis_problem}[tier](rng)
+    """Pilot 2 tiers: T1 = constant monomials, T2 = basis solves, T3 = basis solves for compound targets."""
+    if tier == 1:
+        return _monomial_problem(rng)
+    return _basis_problem(rng, compound_target=tier == 3)
 
 
 GENERATORS = {"derivative": _derivative_problem, "integral": _integral_problem, "dimension": _dimension_problem}

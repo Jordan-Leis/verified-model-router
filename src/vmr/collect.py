@@ -87,14 +87,19 @@ def main() -> None:
     parser.add_argument("--models", default="data/models.json")
     parser.add_argument("--out", default="data/raw")
     parser.add_argument("--budget", type=float, default=4.0)
-    parser.add_argument("--ledger", nargs="*", default=["data/raw", "data/pilot"])
+    parser.add_argument("--ledger", nargs="*", default=None, help="spend directories; default is every data/* dir")
     parser.add_argument("--mock", action="store_true")
     args = parser.parse_args()
     if args.mock and not args.out.startswith("build/"):
         raise SystemExit("Mock output must go under build/ so it can never be mistaken for a result")
     models = json.loads(Path(args.models).read_text())["models"]
     client = MockClient() if args.mock else OpenRouterClient()
-    ledger = [] if args.mock else [Path(p) for p in args.ledger]
+    if args.mock:
+        ledger = []
+    elif args.ledger is None:
+        ledger = sorted(p for p in Path("data").iterdir() if p.is_dir())
+    else:
+        ledger = [Path(p) for p in args.ledger]
     collect(load(args.problems), models, Path(args.out), client, args.budget, ledger)
 
 
