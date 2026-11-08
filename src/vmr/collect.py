@@ -21,6 +21,23 @@ from vmr.prompts import build_prompt
 WORKERS = 8  # Calls are network-bound; interleaving models keeps one slow model from blocking the rest.
 
 
+def scrub_encrypted(value):
+    """Replace provider-encrypted reasoning blobs with a length marker before anything is saved.
+
+    They are opaque ciphertext that only the provider can read, they are useless for analysis, and their
+    random base64 can trip secret scanners.
+    """
+    if isinstance(value, dict):
+        if str(value.get("type", "")).endswith("encrypted") and isinstance(value.get("data"), str):
+            value["data"] = f"<removed: opaque provider-encrypted reasoning, {len(value['data'])} chars>"
+        for item in value.values():
+            scrub_encrypted(item)
+    elif isinstance(value, list):
+        for item in value:
+            scrub_encrypted(item)
+    return value
+
+
 def slug_file(slug: str) -> str:
     return slug.replace("/", "__").replace(":", "_") + ".jsonl"
 
@@ -62,7 +79,7 @@ def collect(problems: list[dict], models: list[dict], out: Path, client, budget:
             "problem_id": problem["id"], "model": model["slug"],
             "request": {"prompt": prompt, "max_tokens": model["max_tokens"],
                         "temperature": model.get("temperature", 0), "extra_body": model.get("extra_body", {})},
-            "collected_at": int(time.time()), "mock": client.mock, **outcome,
+            "collected_at": int(time.time()), "mock": client.mock, **scrub_encrypted(outcome),
         }
         with lock:
             with path.open("a") as handle:

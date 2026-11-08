@@ -102,7 +102,7 @@ Ground truth comes from SymPy. Each integrand has a SymPy antiderivative that th
 - **Antiderivatives:** the answer is differentiated and compared with the integrand, so any constant of integration is fine.
 - **Dimension answers:** exact rational exponent vectors from `sympy.physics.units`.
 
-**Models** (`data/models.json`). Three vendors at three price tiers, picked from the live OpenRouter list on 2026-11-07. All three ran at `reasoning.effort=low`, with `temperature=0` requested, with up to 16,000 output tokens, once per problem. `data/raw/` holds every full response, with tokens and the cost OpenRouter reported.
+**Models** (`data/models.json`). Three vendors at three price tiers, picked from the live OpenRouter list on 2026-11-07. All three ran at `reasoning.effort=low`, with `temperature=0` requested, with up to 16,000 output tokens, once per problem. `data/raw/` holds every full response, with tokens and the cost OpenRouter reported. OpenAI's provider-encrypted reasoning blobs are replaced by a length marker, because they are unreadable ciphertext.
 
 **Router** (`src/vmr/bandit.py`). Thompson sampling with a Beta(1,1) prior for each (family, model). The verifier's verdict is the reward: 1 only for `correct`. The complete response matrix lets the bandit be replayed with no extra API calls, over 2,000 shuffled problem orders and over 2,000 bootstrap resamples of the problems. Arms the router did not pick are never shown to it.
 
