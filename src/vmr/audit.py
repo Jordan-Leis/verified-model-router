@@ -194,7 +194,8 @@ def sample_markdown(sample: list[dict]) -> str:
              "For each one, decide whether the verdict is right. For math problems, paste the answer and the "
              "reference into SymPy or WolframAlpha and compare (for antiderivatives, differentiate the answer). "
              "For `monomial` problems, multiply out the dimensions by hand. `no_answer`, `truncated` and `unparseable` "
-             "are format verdicts: check that the response really lacks a valid final `ANSWER:` line, not whether the math is right.", ""]
+             "are format verdicts: check that the response really lacks a valid final `ANSWER:` line, not whether the math is right. "
+             "Full responses are in `data/raw/<model>.jsonl`; search for the problem id.", ""]
     for i, s in enumerate(sample, 1):
         lines += [f"## {i}. {s['problem_id']} / {s['model']} -> **{s['verdict']}** {('(' + s['reason'] + ')') if s['reason'] else ''} {('[' + s['method'] + ']') if s['method'] else ''}",
                   "", f"Problem: {s['statement']}", "", f"Reference: `{s['truth_or_reference']}`", "",
