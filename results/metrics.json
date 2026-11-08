@@ -1,0 +1,857 @@
+{
+ "source": "openrouter",
+ "n_problems": 120,
+ "models": [
+  "deepseek/deepseek-v4-flash",
+  "google/gemini-3.5-flash-lite",
+  "openai/gpt-6.1-sol"
+ ],
+ "families": [
+  "derivative",
+  "integral",
+  "dimension"
+ ],
+ "runs": 2000,
+ "seed": 20261107,
+ "total_cost_usd": 1.5522,
+ "models_overall": {
+  "deepseek/deepseek-v4-flash": {
+   "n": 120,
+   "status_counts": {
+    "correct": 82,
+    "no_answer": 3,
+    "truncated": 31,
+    "unparseable": 2,
+    "wrong": 2
+   },
+   "strict_accuracy": 0.6833,
+   "strict_accuracy_ci95": [
+    0.5955,
+    0.7598
+   ],
+   "accuracy_when_parsed": 0.9762,
+   "lenient_accuracy": 0.6917,
+   "total_cost_usd": 0.1244,
+   "mean_cost_usd": 0.001036,
+   "mean_completion_tokens": 7053,
+   "verified_by": {
+    "symbolic": 41,
+    "numeric": 4,
+    "dimensional": 37
+   }
+  },
+  "google/gemini-3.5-flash-lite": {
+   "n": 120,
+   "status_counts": {
+    "correct": 53,
+    "no_answer": 4,
+    "unparseable": 1,
+    "wrong": 62
+   },
+   "strict_accuracy": 0.4417,
+   "strict_accuracy_ci95": [
+    0.356,
+    0.531
+   ],
+   "accuracy_when_parsed": 0.4609,
+   "lenient_accuracy": 0.4417,
+   "total_cost_usd": 0.7049,
+   "mean_cost_usd": 0.005875,
+   "mean_completion_tokens": 2324,
+   "verified_by": {
+    "symbolic": 24,
+    "numeric": 3,
+    "dimensional": 26
+   }
+  },
+  "openai/gpt-6.1-sol": {
+   "n": 120,
+   "status_counts": {
+    "correct": 115,
+    "unparseable": 1,
+    "wrong": 4
+   },
+   "strict_accuracy": 0.9583,
+   "strict_accuracy_ci95": [
+    0.9062,
+    0.9821
+   ],
+   "accuracy_when_parsed": 0.9664,
+   "lenient_accuracy": 0.9583,
+   "total_cost_usd": 0.7229,
+   "mean_cost_usd": 0.006024,
+   "mean_completion_tokens": 558,
+   "verified_by": {
+    "symbolic": 71,
+    "numeric": 5,
+    "dimensional": 39
+   }
+  }
+ },
+ "family_by_model": {
+  "derivative|deepseek/deepseek-v4-flash": {
+   "correct": 12,
+   "n": 40,
+   "accuracy": 0.3,
+   "ci95": [
+    0.1807,
+    0.4543
+   ],
+   "status_counts": {
+    "correct": 12,
+    "truncated": 28
+   }
+  },
+  "derivative|google/gemini-3.5-flash-lite": {
+   "correct": 4,
+   "n": 40,
+   "accuracy": 0.1,
+   "ci95": [
+    0.0396,
+    0.2305
+   ],
+   "status_counts": {
+    "correct": 4,
+    "wrong": 36
+   }
+  },
+  "derivative|openai/gpt-6.1-sol": {
+   "correct": 36,
+   "n": 40,
+   "accuracy": 0.9,
+   "ci95": [
+    0.7695,
+    0.9604
+   ],
+   "status_counts": {
+    "correct": 36,
+    "unparseable": 1,
+    "wrong": 3
+   }
+  },
+  "dimension|deepseek/deepseek-v4-flash": {
+   "correct": 37,
+   "n": 40,
+   "accuracy": 0.925,
+   "ci95": [
+    0.8014,
+    0.9742
+   ],
+   "status_counts": {
+    "correct": 37,
+    "no_answer": 2,
+    "wrong": 1
+   }
+  },
+  "dimension|google/gemini-3.5-flash-lite": {
+   "correct": 26,
+   "n": 40,
+   "accuracy": 0.65,
+   "ci95": [
+    0.4951,
+    0.7787
+   ],
+   "status_counts": {
+    "correct": 26,
+    "no_answer": 2,
+    "wrong": 12
+   }
+  },
+  "dimension|openai/gpt-6.1-sol": {
+   "correct": 39,
+   "n": 40,
+   "accuracy": 0.975,
+   "ci95": [
+    0.8712,
+    0.9956
+   ],
+   "status_counts": {
+    "correct": 39,
+    "wrong": 1
+   }
+  },
+  "integral|deepseek/deepseek-v4-flash": {
+   "correct": 33,
+   "n": 40,
+   "accuracy": 0.825,
+   "ci95": [
+    0.6805,
+    0.9125
+   ],
+   "status_counts": {
+    "correct": 33,
+    "no_answer": 1,
+    "truncated": 3,
+    "unparseable": 2,
+    "wrong": 1
+   }
+  },
+  "integral|google/gemini-3.5-flash-lite": {
+   "correct": 23,
+   "n": 40,
+   "accuracy": 0.575,
+   "ci95": [
+    0.422,
+    0.7149
+   ],
+   "status_counts": {
+    "correct": 23,
+    "no_answer": 2,
+    "unparseable": 1,
+    "wrong": 14
+   }
+  },
+  "integral|openai/gpt-6.1-sol": {
+   "correct": 40,
+   "n": 40,
+   "accuracy": 1.0,
+   "ci95": [
+    0.9124,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 40
+   }
+  }
+ },
+ "tier_by_model": {
+  "derivative T1|deepseek/deepseek-v4-flash": {
+   "correct": 10,
+   "n": 10,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7225,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 10
+   }
+  },
+  "derivative T1|google/gemini-3.5-flash-lite": {
+   "correct": 4,
+   "n": 10,
+   "accuracy": 0.4,
+   "ci95": [
+    0.1682,
+    0.6873
+   ],
+   "status_counts": {
+    "correct": 4,
+    "wrong": 6
+   }
+  },
+  "derivative T1|openai/gpt-6.1-sol": {
+   "correct": 10,
+   "n": 10,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7225,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 10
+   }
+  },
+  "derivative T2|deepseek/deepseek-v4-flash": {
+   "correct": 2,
+   "n": 15,
+   "accuracy": 0.1333,
+   "ci95": [
+    0.0374,
+    0.3788
+   ],
+   "status_counts": {
+    "correct": 2,
+    "truncated": 13
+   }
+  },
+  "derivative T2|google/gemini-3.5-flash-lite": {
+   "correct": 0,
+   "n": 15,
+   "accuracy": 0.0,
+   "ci95": [
+    0.0,
+    0.2039
+   ],
+   "status_counts": {
+    "wrong": 15
+   }
+  },
+  "derivative T2|openai/gpt-6.1-sol": {
+   "correct": 14,
+   "n": 15,
+   "accuracy": 0.9333,
+   "ci95": [
+    0.7018,
+    0.9881
+   ],
+   "status_counts": {
+    "correct": 14,
+    "wrong": 1
+   }
+  },
+  "derivative T3|deepseek/deepseek-v4-flash": {
+   "correct": 0,
+   "n": 15,
+   "accuracy": 0.0,
+   "ci95": [
+    0.0,
+    0.2039
+   ],
+   "status_counts": {
+    "truncated": 15
+   }
+  },
+  "derivative T3|google/gemini-3.5-flash-lite": {
+   "correct": 0,
+   "n": 15,
+   "accuracy": 0.0,
+   "ci95": [
+    0.0,
+    0.2039
+   ],
+   "status_counts": {
+    "wrong": 15
+   }
+  },
+  "derivative T3|openai/gpt-6.1-sol": {
+   "correct": 12,
+   "n": 15,
+   "accuracy": 0.8,
+   "ci95": [
+    0.5481,
+    0.9295
+   ],
+   "status_counts": {
+    "correct": 12,
+    "unparseable": 1,
+    "wrong": 2
+   }
+  },
+  "dimension T1|deepseek/deepseek-v4-flash": {
+   "correct": 9,
+   "n": 10,
+   "accuracy": 0.9,
+   "ci95": [
+    0.5958,
+    0.9821
+   ],
+   "status_counts": {
+    "correct": 9,
+    "no_answer": 1
+   }
+  },
+  "dimension T1|google/gemini-3.5-flash-lite": {
+   "correct": 7,
+   "n": 10,
+   "accuracy": 0.7,
+   "ci95": [
+    0.3968,
+    0.8922
+   ],
+   "status_counts": {
+    "correct": 7,
+    "wrong": 3
+   }
+  },
+  "dimension T1|openai/gpt-6.1-sol": {
+   "correct": 10,
+   "n": 10,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7225,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 10
+   }
+  },
+  "dimension T2|deepseek/deepseek-v4-flash": {
+   "correct": 14,
+   "n": 15,
+   "accuracy": 0.9333,
+   "ci95": [
+    0.7018,
+    0.9881
+   ],
+   "status_counts": {
+    "correct": 14,
+    "no_answer": 1
+   }
+  },
+  "dimension T2|google/gemini-3.5-flash-lite": {
+   "correct": 11,
+   "n": 15,
+   "accuracy": 0.7333,
+   "ci95": [
+    0.4805,
+    0.891
+   ],
+   "status_counts": {
+    "correct": 11,
+    "no_answer": 1,
+    "wrong": 3
+   }
+  },
+  "dimension T2|openai/gpt-6.1-sol": {
+   "correct": 14,
+   "n": 15,
+   "accuracy": 0.9333,
+   "ci95": [
+    0.7018,
+    0.9881
+   ],
+   "status_counts": {
+    "correct": 14,
+    "wrong": 1
+   }
+  },
+  "dimension T3|deepseek/deepseek-v4-flash": {
+   "correct": 14,
+   "n": 15,
+   "accuracy": 0.9333,
+   "ci95": [
+    0.7018,
+    0.9881
+   ],
+   "status_counts": {
+    "correct": 14,
+    "wrong": 1
+   }
+  },
+  "dimension T3|google/gemini-3.5-flash-lite": {
+   "correct": 8,
+   "n": 15,
+   "accuracy": 0.5333,
+   "ci95": [
+    0.3012,
+    0.7519
+   ],
+   "status_counts": {
+    "correct": 8,
+    "no_answer": 1,
+    "wrong": 6
+   }
+  },
+  "dimension T3|openai/gpt-6.1-sol": {
+   "correct": 15,
+   "n": 15,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7961,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 15
+   }
+  },
+  "integral T1|deepseek/deepseek-v4-flash": {
+   "correct": 9,
+   "n": 10,
+   "accuracy": 0.9,
+   "ci95": [
+    0.5958,
+    0.9821
+   ],
+   "status_counts": {
+    "correct": 9,
+    "unparseable": 1
+   }
+  },
+  "integral T1|google/gemini-3.5-flash-lite": {
+   "correct": 9,
+   "n": 10,
+   "accuracy": 0.9,
+   "ci95": [
+    0.5958,
+    0.9821
+   ],
+   "status_counts": {
+    "correct": 9,
+    "no_answer": 1
+   }
+  },
+  "integral T1|openai/gpt-6.1-sol": {
+   "correct": 10,
+   "n": 10,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7225,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 10
+   }
+  },
+  "integral T2|deepseek/deepseek-v4-flash": {
+   "correct": 12,
+   "n": 15,
+   "accuracy": 0.8,
+   "ci95": [
+    0.5481,
+    0.9295
+   ],
+   "status_counts": {
+    "correct": 12,
+    "no_answer": 1,
+    "truncated": 1,
+    "wrong": 1
+   }
+  },
+  "integral T2|google/gemini-3.5-flash-lite": {
+   "correct": 8,
+   "n": 15,
+   "accuracy": 0.5333,
+   "ci95": [
+    0.3012,
+    0.7519
+   ],
+   "status_counts": {
+    "correct": 8,
+    "wrong": 7
+   }
+  },
+  "integral T2|openai/gpt-6.1-sol": {
+   "correct": 15,
+   "n": 15,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7961,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 15
+   }
+  },
+  "integral T3|deepseek/deepseek-v4-flash": {
+   "correct": 12,
+   "n": 15,
+   "accuracy": 0.8,
+   "ci95": [
+    0.5481,
+    0.9295
+   ],
+   "status_counts": {
+    "correct": 12,
+    "truncated": 2,
+    "unparseable": 1
+   }
+  },
+  "integral T3|google/gemini-3.5-flash-lite": {
+   "correct": 6,
+   "n": 15,
+   "accuracy": 0.4,
+   "ci95": [
+    0.1982,
+    0.6425
+   ],
+   "status_counts": {
+    "correct": 6,
+    "no_answer": 1,
+    "unparseable": 1,
+    "wrong": 7
+   }
+  },
+  "integral T3|openai/gpt-6.1-sol": {
+   "correct": 15,
+   "n": 15,
+   "accuracy": 1.0,
+   "ci95": [
+    0.7961,
+    1.0
+   ],
+   "status_counts": {
+    "correct": 15
+   }
+  }
+ },
+ "policies": {
+  "only deepseek/deepseek-v4-flash": {
+   "accuracy": 0.6833,
+   "mean_cost_usd": 0.001036,
+   "accuracy_problem_interval": [
+    0.6167,
+    0.75
+   ]
+  },
+  "only google/gemini-3.5-flash-lite": {
+   "accuracy": 0.4417,
+   "mean_cost_usd": 0.005875,
+   "accuracy_problem_interval": [
+    0.3667,
+    0.5167
+   ]
+  },
+  "only openai/gpt-6.1-sol": {
+   "accuracy": 0.9583,
+   "mean_cost_usd": 0.006024,
+   "accuracy_problem_interval": [
+    0.925,
+    0.9917
+   ]
+  },
+  "best single model (hindsight)": {
+   "accuracy": 0.9583,
+   "mean_cost_usd": 0.006024,
+   "accuracy_problem_interval": [
+    0.925,
+    0.9917
+   ]
+  },
+  "best model per family (hindsight)": {
+   "accuracy": 0.9583,
+   "mean_cost_usd": 0.006024,
+   "accuracy_problem_interval": [
+    0.925,
+    0.9917
+   ]
+  },
+  "per-problem oracle": {
+   "accuracy": 0.9667,
+   "mean_cost_usd": 0.00369,
+   "accuracy_problem_interval": [
+    0.9333,
+    0.9917
+   ]
+  },
+  "verify-and-escalate cascade (cheapest first)": {
+   "accuracy": 0.9667,
+   "mean_cost_usd": 0.007523,
+   "accuracy_problem_interval": [
+    0.9333,
+    0.9917
+   ]
+  },
+  "Thompson sampling per family": {
+   "accuracy": 0.8859,
+   "mean_cost_usd": 0.005336,
+   "accuracy_order_interval": [
+    0.8417,
+    0.925
+   ],
+   "accuracy_problem_interval": [
+    0.825,
+    0.9333
+   ]
+  },
+  "Thompson sampling, no family context": {
+   "accuracy": 0.925,
+   "mean_cost_usd": 0.005707,
+   "accuracy_order_interval": [
+    0.8833,
+    0.95
+   ],
+   "accuracy_problem_interval": [
+    0.8583,
+    0.9667
+   ]
+  },
+  "uniform random": {
+   "accuracy": 0.6941,
+   "mean_cost_usd": 0.004314,
+   "accuracy_order_interval": [
+    0.6333,
+    0.7583
+   ],
+   "accuracy_problem_interval": [
+    0.6167,
+    0.775
+   ]
+  }
+ },
+ "paired_problem_intervals": {
+  "Thompson per family minus best single (hindsight)": [
+   -0.1167,
+   -0.0333
+  ],
+  "Thompson per family minus no-context Thompson": [
+   -0.0917,
+   0.0167
+  ],
+  "Thompson per family minus uniform random": [
+   0.1083,
+   0.275
+  ]
+ },
+ "paired_means": {
+  "Thompson per family minus best single (hindsight)": -0.0724,
+  "Thompson per family minus no-context Thompson": -0.0391
+ },
+ "cost_aware_thompson": [
+  {
+   "value_per_correct_usd": 0.001,
+   "accuracy": 0.6883,
+   "accuracy_order_interval": [
+    0.6667,
+    0.7333
+   ],
+   "mean_cost_usd": 0.001375
+  },
+  {
+   "value_per_correct_usd": 0.003,
+   "accuracy": 0.6896,
+   "accuracy_order_interval": [
+    0.6667,
+    0.7333
+   ],
+   "mean_cost_usd": 0.00141
+  },
+  {
+   "value_per_correct_usd": 0.01,
+   "accuracy": 0.7026,
+   "accuracy_order_interval": [
+    0.6667,
+    0.7583
+   ],
+   "mean_cost_usd": 0.001771
+  },
+  {
+   "value_per_correct_usd": 0.03,
+   "accuracy": 0.8213,
+   "accuracy_order_interval": [
+    0.6917,
+    0.8917
+   ],
+   "mean_cost_usd": 0.004107
+  },
+  {
+   "value_per_correct_usd": 0.1,
+   "accuracy": 0.8741,
+   "accuracy_order_interval": [
+    0.8167,
+    0.9083
+   ],
+   "mean_cost_usd": 0.005083
+  }
+ ],
+ "reward_noise_simulation": [
+  {
+   "false_accept_and_false_reject_rate": 0.0,
+   "true_accuracy": 0.8854,
+   "accuracy_order_interval": [
+    0.8417,
+    0.9167
+   ]
+  },
+  {
+   "false_accept_and_false_reject_rate": 0.1,
+   "true_accuracy": 0.8562,
+   "accuracy_order_interval": [
+    0.7833,
+    0.9083
+   ]
+  },
+  {
+   "false_accept_and_false_reject_rate": 0.2,
+   "true_accuracy": 0.822,
+   "accuracy_order_interval": [
+    0.7167,
+    0.8917
+   ]
+  },
+  {
+   "false_accept_and_false_reject_rate": 0.3,
+   "true_accuracy": 0.7831,
+   "accuracy_order_interval": [
+    0.6583,
+    0.875
+   ]
+  },
+  {
+   "false_accept_and_false_reject_rate": 0.4,
+   "true_accuracy": 0.7389,
+   "accuracy_order_interval": [
+    0.6167,
+    0.85
+   ]
+  }
+ ],
+ "specialization": {
+  "overall_best_model": "openai/gpt-6.1-sol",
+  "per_family": {
+   "derivative": {
+    "best_model": "openai/gpt-6.1-sol",
+    "accuracy_by_model": {
+     "deepseek/deepseek-v4-flash": 0.3,
+     "google/gemini-3.5-flash-lite": 0.1,
+     "openai/gpt-6.1-sol": 0.9
+    },
+    "best_vs_overall_best_mcnemar": {
+     "only_first_correct": 0,
+     "only_second_correct": 0,
+     "p_two_sided": 1.0
+    }
+   },
+   "integral": {
+    "best_model": "openai/gpt-6.1-sol",
+    "accuracy_by_model": {
+     "deepseek/deepseek-v4-flash": 0.825,
+     "google/gemini-3.5-flash-lite": 0.575,
+     "openai/gpt-6.1-sol": 1.0
+    },
+    "best_vs_overall_best_mcnemar": {
+     "only_first_correct": 0,
+     "only_second_correct": 0,
+     "p_two_sided": 1.0
+    }
+   },
+   "dimension": {
+    "best_model": "openai/gpt-6.1-sol",
+    "accuracy_by_model": {
+     "deepseek/deepseek-v4-flash": 0.925,
+     "google/gemini-3.5-flash-lite": 0.65,
+     "openai/gpt-6.1-sol": 0.975
+    },
+    "best_vs_overall_best_mcnemar": {
+     "only_first_correct": 0,
+     "only_second_correct": 0,
+     "p_two_sided": 1.0
+    }
+   }
+  },
+  "headroom_H": 0.0,
+  "headroom_permutation_p": 1.0,
+  "permutations": 5000,
+  "split_half_gain_mean": -0.0089,
+  "split_half_gain_2.5_97.5_percentiles": [
+   -0.0333,
+   0.0
+  ],
+  "rule": {
+   "1_some_family_best_differs": false,
+   "2_permutation_p_below_0.05": false,
+   "3_split_half_gain_at_least_0.02": false
+  },
+  "specialized": false
+ },
+ "error_overlap": {
+  "problems_solved_by_k_models": {
+   "0": 4,
+   "1": 31,
+   "2": 36,
+   "3": 49
+  },
+  "pairwise_both_wrong": {
+   "deepseek/deepseek-v4-flash & google/gemini-3.5-flash-lite": 34,
+   "deepseek/deepseek-v4-flash & openai/gpt-6.1-sol": 5,
+   "google/gemini-3.5-flash-lite & openai/gpt-6.1-sol": 4
+  }
+ },
+ "router_final_third_pick_share": {
+  "derivative": {
+   "deepseek/deepseek-v4-flash": 0.0187,
+   "google/gemini-3.5-flash-lite": 0.0101,
+   "openai/gpt-6.1-sol": 0.9711
+  },
+  "integral": {
+   "deepseek/deepseek-v4-flash": 0.0727,
+   "google/gemini-3.5-flash-lite": 0.0159,
+   "openai/gpt-6.1-sol": 0.9113
+  },
+  "dimension": {
+   "deepseek/deepseek-v4-flash": 0.3249,
+   "google/gemini-3.5-flash-lite": 0.0348,
+   "openai/gpt-6.1-sol": 0.6404
+  }
+ }
+}
