@@ -78,7 +78,22 @@ def cascade_order(m: Matrix) -> np.ndarray:
     return np.argsort(m.cost.mean(axis=0))
 
 
-def static_policies(m: Matrix, rows: np.ndarray) -> dict[str, tuple[float, float]]:
+def pilot_family_arms(m: Matrix, pilots: Path = Path("results/pilots.json")) -> np.ndarray | None:
+    """Per-family best model on pilot 2, chosen before the main run existed: a baseline without hindsight.
+
+    Ties go to the model listed first in data/models.json, which is the cheapest.
+    """
+    if not pilots.exists():
+        return None
+    scores = json.loads(pilots.read_text())["pilot2"]
+    arms = []
+    for family in m.family_names:
+        accuracy = [scores[f"{family}|{model}"]["accuracy"] for model in m.models]
+        arms.append(int(np.argmax(accuracy)))
+    return np.array(arms)
+
+
+def static_policies(m: Matrix, rows: np.ndarray, pilot_arms: np.ndarray | None = None) -> dict[str, tuple[float, float]]:
     """(accuracy, mean cost per problem) for the deterministic policies on the given problems."""
     correct, cost, fam = m.correct[rows], m.cost[rows], m.families[rows]
     out = {f"only {name}": (correct[:, k].mean(), cost[:, k].mean()) for k, name in enumerate(m.models)}
@@ -87,6 +102,9 @@ def static_policies(m: Matrix, rows: np.ndarray) -> dict[str, tuple[float, float
     per_family = family_best_arms(m, rows)[fam]
     pick = np.arange(rows.size)
     out["best model per family (hindsight)"] = (correct[pick, per_family].mean(), cost[pick, per_family].mean())
+    if pilot_arms is not None:
+        chosen = pilot_arms[fam]
+        out["best model per family, chosen on pilot 2 (no hindsight)"] = (correct[pick, chosen].mean(), cost[pick, chosen].mean())
     any_correct = correct.any(axis=1)
     cheapest_correct = np.where(correct, cost, np.inf).min(axis=1)
     out["per-problem oracle"] = (any_correct.mean(), np.where(any_correct, cheapest_correct, cost.min(axis=1)).mean())
@@ -146,15 +164,17 @@ def model_table(rows: list[dict], m: Matrix) -> dict:
 
 
 def cell_table(rows: list[dict], key: str) -> dict:
-    out = {}
+    out, spend = {}, Counter()
     for r in rows:
-        cell = out.setdefault(f"{r[key]}|{r['model']}", Counter())
-        cell[r["status"]] += 1
+        name = f"{r[key]}|{r['model']}"
+        out.setdefault(name, Counter())[r["status"]] += 1
+        spend[name] += r["cost"]
     table = {}
     for name, counts in sorted(out.items()):
         n = sum(counts.values())
         table[name] = {"correct": counts["correct"], "n": n, "accuracy": r4(counts["correct"] / n),
-                       "ci95": wilson(counts["correct"], n), "status_counts": dict(sorted(counts.items()))}
+                       "ci95": wilson(counts["correct"], n), "mean_cost_usd": round(spend[name] / n, 6),
+                       "status_counts": dict(sorted(counts.items()))}
     return table
 
 
@@ -167,8 +187,9 @@ def run(verdicts: Path, out_dir: Path, source: str) -> dict:
     boots = bootstrap_orders(m.families, RUNS, rng)
 
     policies = {}
-    static = static_policies(m, everything)
-    boot_static = [static_policies(m, b) for b in boots]
+    pilot_arms = pilot_family_arms(m)
+    static = static_policies(m, everything, pilot_arms)
+    boot_static = [static_policies(m, b, pilot_arms) for b in boots]
     for name, (acc, cost) in static.items():
         policies[name] = {"accuracy": r4(acc), "mean_cost_usd": round(float(cost), 6),
                           "accuracy_problem_interval": interval(np.array([b[name][0] for b in boot_static]))}
@@ -242,6 +263,7 @@ def run(verdicts: Path, out_dir: Path, source: str) -> dict:
         "headroom_H": r4(h), "headroom_permutation_p": r4(p_value), "permutations": PERMUTATIONS,
         "split_half_gain_mean": r4(gains.mean()), "split_half_gain_2.5_97.5_percentiles": interval(gains),
         "rule": rule, "specialized": all(rule.values()),
+        "pilot2_family_choices": {f: m.models[a] for f, a in zip(m.family_names, pilot_arms)} if pilot_arms is not None else None,
     }
 
     solved_by = Counter(int(v) for v in m.correct.sum(axis=1))
