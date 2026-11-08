@@ -86,6 +86,8 @@ def pilot_family_arms(m: Matrix, pilots: Path = Path("results/pilots.json")) -> 
     if not pilots.exists():
         return None
     scores = json.loads(pilots.read_text())["pilot2"]
+    if any(f"{family}|{model}" not in scores for family in m.family_names for model in m.models):
+        return None  # The pilots used other models (for example, a mock run), so there is no pilot choice.
     arms = []
     for family in m.family_names:
         accuracy = [scores[f"{family}|{model}"]["accuracy"] for model in m.models]
