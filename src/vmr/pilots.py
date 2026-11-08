@@ -1,4 +1,6 @@
-"""Rescore the calibration pilots into results/pilots.json. Pilots are never part of any result."""
+"""Rescore the calibration pilots, and total every dollar spent, into results/pilots.json.
+
+Pilots are never part of any result."""
 
 from __future__ import annotations
 
@@ -21,6 +23,11 @@ def main() -> None:
                 cells[key][0] += r["status"] == "correct"
                 cells[key][1] += 1
         out[name] = {k: {"correct": c, "n": n, "accuracy": round(c / n, 4)} for k, (c, n) in sorted(cells.items())}
+    from vmr.collect import read_records, record_cost
+
+    spend = {p.name: round(sum(record_cost(r) for f in sorted(p.glob("*.jsonl")) for r in read_records(f)), 4)
+             for p in sorted(Path("data").iterdir()) if p.is_dir()}
+    out["spend_usd_by_directory"] = {**spend, "all": round(sum(spend.values()), 4)}
     Path("results/pilots.json").write_text(json.dumps(out, indent=1) + "\n")
     print("results/pilots.json written")
 

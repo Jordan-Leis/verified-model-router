@@ -212,5 +212,13 @@
    "n": 10,
    "accuracy": 1.0
   }
+ },
+ "spend_usd_by_directory": {
+  "pilot1": 0.2499,
+  "pilot2": 0.3431,
+  "raw": 1.5522,
+  "smoke": 0.0719,
+  "smoke_v1": 0.0014,
+  "all": 2.2185
  }
 }
