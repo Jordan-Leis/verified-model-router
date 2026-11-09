@@ -159,3 +159,7 @@ Claude Code (Anthropic) wrote most of the code and the text in this repository, 
 - reporting a null result as a finding
 
 Anthropic models were left out of the comparison on purpose, because Claude wrote the harness. Jordan has not yet hand-checked the verifier sample or re-derived the statistics. Those are open items, not completed review.
+
+## Licence
+
+Code in this repo: MIT licence, see [LICENSE](LICENSE). Model responses in `data/` are outputs from the providers named in each file, kept so `make reproduce` works offline.
